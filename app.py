@@ -328,11 +328,13 @@ def verify_health_information(text_to_verify: str, high_caution: bool = True) ->
     try:
         response = model.generate_content(prompt)
     except ResourceExhausted:
-        st.warning(
-            "VeriDoc est victime de son succes ! Beaucoup de verifications sont en cours. "
-            "Merci de patienter environ une minute avant de reessayer."
-        )
-        return {"throttled": True}
+        return {
+            "throttled": True,
+            "warning": (
+                "VeriDoc est victime de son succes ! Beaucoup de verifications sont en cours. "
+                "Merci de patienter environ une minute avant de reessayer."
+            ),
+        }
     raw_text = getattr(response, "text", "") or str(response)
     try:
         data = _extract_json(raw_text)
@@ -360,6 +362,13 @@ def _result_theme(verdict: str) -> str:
 
 def _render_result(result: dict[str, Any]) -> None:
     if result.get("throttled"):
+        st.warning(
+            result.get(
+                "warning",
+                "VeriDoc est victime de son succes ! Beaucoup de verifications sont en cours. "
+                "Merci de patienter environ une minute avant de reessayer.",
+            )
+        )
         return
     if "error" in result:
         st.error(result["error"])
