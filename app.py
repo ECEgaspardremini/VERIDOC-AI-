@@ -1,7 +1,6 @@
 import json
 import os
 import re
-from pathlib import Path
 from typing import Any, Optional
 
 import streamlit as st
@@ -42,6 +41,16 @@ def _inject_health_theme() -> None:
                 color: #eefbf4;
                 margin-bottom: 0.22rem;
                 text-shadow: 0 6px 26px rgba(58, 186, 125, 0.18);
+            }
+            .brand-veridoc {
+                font-family: "Orbitron", "Exo 2", "Rajdhani", "Segoe UI", sans-serif;
+                font-size: 1rem;
+                font-weight: 700;
+                letter-spacing: 0.18em;
+                color: #d8f8e6;
+                text-transform: uppercase;
+                margin-bottom: 0.45rem;
+                opacity: 0.95;
             }
             .hero-subtitle {
                 color: #b7d9c7;
@@ -425,17 +434,6 @@ def _render_footer_badges() -> None:
     )
 
 
-def _get_logo_paths() -> tuple[Optional[Path], Optional[Path]]:
-    static_dir = Path(__file__).resolve().parent / "static"
-    square_logo = static_dir / "logo veridoc 1.png"
-    horizontal_logo = static_dir / "logo veridoc 2.png"
-
-    return (
-        square_logo if square_logo.exists() else None,
-        horizontal_logo if horizontal_logo.exists() else None,
-    )
-
-
 def main() -> None:
     st.set_page_config(page_title="Agent Sante - Verif Info", page_icon="🩺")
     _inject_health_theme()
@@ -449,21 +447,12 @@ def main() -> None:
         st.session_state.last_result = None
 
     _inject_thinking_ring(bool(st.session_state.is_thinking))
-    square_logo, horizontal_logo = _get_logo_paths()
-
-    if horizontal_logo is not None:
-        st.image(str(horizontal_logo), width=165)
-
-    title_col, seal_col = st.columns([6, 1.2])
-    with title_col:
-        st.markdown('<div class="hero-title">Agent Sante IA</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="hero-subtitle">Verifie rapidement une information sante avec un rendu simple, clair et prudent.</div>',
-            unsafe_allow_html=True,
-        )
-    with seal_col:
-        if square_logo is not None:
-            st.image(str(square_logo), width=76)
+    st.markdown('<div class="brand-veridoc">VERIDOC AI</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">Agent Sante IA</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="hero-subtitle">Verifie rapidement une information sante avec un rendu simple, clair et prudent.</div>',
+        unsafe_allow_html=True,
+    )
 
     status_placeholder = st.empty()
     if st.session_state.is_thinking:
