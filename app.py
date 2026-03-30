@@ -317,6 +317,7 @@ def verify_health_information(text_to_verify: str, high_caution: bool = True) ->
 
     try:
         import google.generativeai as genai
+        from google.api_core.exceptions import ResourceExhausted
     except ImportError:
         return {"error": "Dependance manquante: installe google-generativeai."}
 
@@ -324,7 +325,14 @@ def verify_health_information(text_to_verify: str, high_caution: bool = True) ->
     model = genai.GenerativeModel(model_name="gemini-2.5-flash")
     prompt = _build_prompt(text_to_verify, high_caution=high_caution)
 
-    response = model.generate_content(prompt)
+    try:
+        response = model.generate_content(prompt)
+    except ResourceExhausted:
+        st.warning(
+            "VeriDoc est victime de son succes ! Beaucoup de verifications sont en cours. "
+            "Merci de patienter environ une minute avant de reessayer."
+        )
+        return {"throttled": True}
     raw_text = getattr(response, "text", "") or str(response)
     try:
         data = _extract_json(raw_text)
@@ -351,6 +359,8 @@ def _result_theme(verdict: str) -> str:
 
 
 def _render_result(result: dict[str, Any]) -> None:
+    if result.get("throttled"):
+        return
     if "error" in result:
         st.error(result["error"])
         if "raw" in result:
