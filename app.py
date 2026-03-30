@@ -275,6 +275,9 @@ Mission:
 - Evaluer la fiabilite d'une affirmation sante.
 - Rester prudent et transparent sur l'incertitude.
 - Ne jamais poser de diagnostic ni proposer de traitement personnalise.
+- Prioriser la securite et la rigueur factuelle.
+- Citer des sources institutionnelles pertinentes et reconnues.
+- Ne jamais inventer de source: si une source est incertaine, l'indiquer explicitement.
 
 Regles de securite:
 - Si urgence potentielle, recommander de contacter les services d'urgence.
@@ -289,9 +292,15 @@ Reponds UNIQUEMENT en JSON valide avec ces cles exactes:
   "niveau_confiance": "Faible | Moyen | Eleve",
   "raisons_principales": ["..."],
   "points_a_verifier": ["..."],
-  "sources_recommandees": ["OMS", "HAS", "CDC", "Ministere de la Sante"],
+  "sources_recommandees": ["Nom de la source - URL (si connue)"],
   "avertissement_sante": "..."
 }}
+
+Exigences de qualite:
+- Verifier la coherence scientifique generale avant de conclure.
+- En cas de doute, choisir "Incertain" plutot qu'une affirmation trop forte.
+- Donner 2 a 4 sources recommandees maximum, de preference institutionnelles (OMS, HAS, CDC, Ministere de la Sante, NIH, Inserm).
+- Ne pas pretendre a une certitude absolue.
 
 Information a verifier:
 \"\"\"{text_to_verify}\"\"\"
@@ -331,7 +340,7 @@ def verify_health_information(text_to_verify: str, high_caution: bool = True) ->
         return {"error": "Dependance manquante: installe google-generativeai."}
 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel(model_name="gemini-2.5-flash")
+    model = genai.GenerativeModel(model_name="gemini-2.5-flash-lite")
     prompt = _build_prompt(text_to_verify, high_caution=high_caution)
 
     try:
